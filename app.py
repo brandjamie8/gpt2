@@ -2,7 +2,7 @@ import streamlit as st
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 # Load a free text-to-SQL model from Hugging Face
-model_name = "tscholak/cxmefzzi"  # Pre-trained model for text-to-SQL
+model_name = "ekshat/Llama-2-7b-chat-finetune-for-text2sql"  # Pre-trained model for text-to-SQL
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
