@@ -1,10 +1,10 @@
 import streamlit as st
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Load a free text-to-SQL model from Hugging Face
 model_name = "ekshat/Llama-2-7b-chat-finetune-for-text2sql"  # Pre-trained model for text-to-SQL
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
 
 st.title('Natural Language to SQL Generator')
 st.markdown("This tool generates SQL queries from natural language requests using a free Hugging Face model.")
