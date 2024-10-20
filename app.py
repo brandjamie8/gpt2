@@ -1,32 +1,34 @@
-import torch
 import streamlit as st
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
-st.title('Natural Language Generation with GPT-2')
-st.markdown("A [simple demonstration](https://github.com/CaliberAI/streamlit-get-stories-aylien) of using [Streamlit](https://streamlit.io/) with [HuggingFace's GPT-2](https://github.com/huggingface/transformers/).")
+# Load a free text-to-SQL model from Hugging Face
+model_name = "tscholak/opt-t5-xxl-for-sql-v2"  # Pre-trained model for text-to-SQL
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
-seed = st.text_input('Seed', 'The dog jumped')
-num_return_sequences = st.number_input('Number of generated sequences', 1, 100, 20)
-max_length = st.number_input('Length of sequences', 5, 100, 20)
-go = st.button('Generate')
+st.title('Natural Language to SQL Generator')
+st.markdown("This tool generates SQL queries from natural language requests using a free Hugging Face model.")
+
+# Input: Natural Language Request
+natural_language_input = st.text_input('Describe your data request', 'Get all customers who signed up last month')
+
+# Button to generate SQL
+go = st.button('Generate SQL Query')
 
 if go:
     try:
-        model = GPT2LMHeadModel.from_pretrained('gpt2')
-        tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-        input_ids = torch.tensor(tokenizer.encode(seed)).unsqueeze(0)
-        output = model.generate(input_ids=input_ids,
-                                max_length=max_length,
-                                num_return_sequences=num_return_sequences,
-                                do_sample=True,
-                                length_penalty=10)
-        sequences = []
-        for j in range(len(output)):
-          for i in range(len(output[j])):
-              sequences.append(tokenizer.decode(output[j][i].tolist(), skip_special_tokens=True))
-        st.dataframe(sequences)
+        # Tokenize and generate SQL query
+        inputs = tokenizer.encode(f"translate to SQL: {natural_language_input}", return_tensors="pt", max_length=512, truncation=True)
+        outputs = model.generate(inputs, max_length=150)
+
+        # Decode the generated query
+        sql_query = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        # Display the generated SQL query
+        st.code(sql_query, language='sql')
+        
     except Exception as e:
-        st.exception("Exception: %s\n" % e)
+        st.exception(f"Exception: {e}")
 
 st.markdown('___')
-st.markdown('by [CaliberAI](https://github.com/CaliberAI/)')
+st.markdown('by [YourName]')
